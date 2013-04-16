@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<!-- saved from url=(0045)file:///C:/Users/Taylor/code/rynth/index.html -->
+<html>
+	<head>
+		<link rel="stylesheet" href="stylesheets/master.css" />
+		<script language="javascript" src="javascripts/rynthobjects.js" type="text/javascript"></script>
+		<script language="javascript" src="javascripts/rynthinput.js" type="text/javascript"></script>
+		<script language="javascript" src="javascripts/rynthcollision.js" type="text/javascript"></script>
+		<script language="javascript" src="javascripts/rynthastar.js" type="text/javascript"></script>
+		<script language="javascript" src="javascripts/rynthengine.js" type="text/javascript"></script>
+		<script language="javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js" type="text/javascript"></script>
+		<script language="javascript" src="javascripts/jquery.hotkeys.js" type="text/javascript"></script>
+		<script language="javascript" src="javascripts/key_status.js" type="text/javascript"></script>
+		<script language="javascript" src="javascripts/util.js" type="text/javascript"></script>
+		
+		<!--<script language="javascript" src="javascripts/sprite.js" type="text/javascript"></script>
+		<script language="javascript" src="javascripts/sound.js" type="text/javascript"></script>-->
+	</head>
+	<body id="body">
+		<canvas id="canvas" width="800" height="600" tabindex="1"/>
+		
+		<script type="text/javascript">
+		//get handle to the canvas
+		var canvas = document.getElementById('canvas').getContext('2d');
+		
+		//give focus to the canvas
+		document.getElementById('canvas').focus();
+		
+		//instantiate the game engine and start the main loop.
+		//This is not a true singleton it just happens to only have one global instance, 
+		//so don't go making more objects now ok?!?
+		var gameEngine = new GameEngine();
+		var inputHandler = new InputHandler();
+		
+		//call the game loop every 30 seconds
+		setInterval(
+			gameEngine.step, 
+			(1000/30)
+		);
+			
+		</script>
+	</body>
+</html>
