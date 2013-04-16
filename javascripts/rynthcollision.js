@@ -39,8 +39,8 @@ CollisionDetector = Class.extend({
 	performCollisions: function() {
 	
 		//loop through the unit array, check for monster hits and winning the game
-		for(var i = 0; i < unitManger.units.length; i++) {
-			if(unitManager.units[i].type == "runner" && this.collisionTest(unitManager.units[i], map.getGoalTile())) {
+		for(var i = 0; i < unitManager.units.length; i++) {
+			if(unitManager.units[i].type == "runner" && this.collisionTest(map.getGoalTile(), unitManager.units[i])) {
 				gameEngine.winScreen();
 			}
 		

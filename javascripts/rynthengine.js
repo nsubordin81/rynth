@@ -42,8 +42,8 @@ GameEngine = Class.extend({
 		update: function() {
 				inputHandler.handleInput();
 
-				var path = findPath(map.getTile(0, 0), map.getTile(10, 10));
-				console.log(path.length);
+				//var path = findPath(map.getTile(0, 0), map.getTile(10, 10));
+				//console.log(path.length);
 				
 				this.monsterLoadTime += 1;
 				if(this.monsterLoadTime == 600 && unitManager.monsterCount <= this.maxMonsters) {
@@ -76,6 +76,7 @@ GameEngine = Class.extend({
 				if(unitManager.units.length > 0) {
 					collisionDetector.nudgePlayer(unitManager.units[unitManager.selectedUnit]);
 				}
+				collisionDetector.performCollisions();
 				
 			},
 		
