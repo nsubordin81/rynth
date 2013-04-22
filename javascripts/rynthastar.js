@@ -28,45 +28,89 @@ findPath = function(pathStart, pathEnd) {
 	var worldHeight = map.tiles[0].length;
 	var worldSize =	worldWidth * worldHeight;
 	
-		var distanceFunction = function(current, end) {
-			return abs(current[0] - end[0]) + Math.abs(current[1] - end[1]);
-		}
+// distanceFunction functions
+	// these return how far away a point is to another
+
+	function ManhattanDistance(Point, Goal)
+	{	// linear movement - no diagonals - just cardinal directions (NSEW)
+		return abs(Point.x - Goal.x) + abs(Point.y - Goal.y);
+	}
 	
 		var findNeighbours = function(){}; //starts out empty
 		//my take on it, integrates with my code.
-		function Neighbours(tileCenter) {
-			//I only want my NPCs to be able to go up and down, back and forth. 
-			var tooManyNeighbours = map.getSurroundingTiles(tileCenter);
+		function Neighbours(x, y) {
+			/*//I only want my NPCs to be able to go up and down, back and forth. 
+			var tooManyNeighbours = map.getSurroundingTiles([x,y]);
 			var fillerup = [];
 			for(var i = 0; i < tooManyNeighbours.length; i++) {
 				if(tooManyNeighbours[i].walkable) {
 					//eliminate diagonal tiles
 					var neighborCenter = tooManyNeighbours[i].getIndicies();
-					var tileRC = map.getOccupiedTile(tileCenter);
+					var tileRC = map.getOccupiedTile([x,y]);
 					if(neighborCenter[0] == tileRC[0] || neighborCenter[1] == tileRC[1]) {
-						fillerup.push(tooManyNeighbours[i]);
+						var indicies = tooManyNeighbours[i].getIndicies();
+						fillerup.push({x:indicies[0], y:indicies[1]});
 					}
 				}
 			
 			}
 			return fillerup;
-		
-		}
-		
-		function Node(Parent, Point) {
-		
-			var newNode = {
-				Parent: Parent,
-				value:Point.x + (Point.y * worldWidth),
-				heuristic: 0,
-				score: 0
-				};
-				return newNode;
 			}
+		*/
+		
+		var	N = y - 1,
+		S = y + 1,
+		E = x + 1,
+		W = x - 1,
+		myN = N > -1 && canWalkHere(x, N),
+		myS = S < worldHeight && canWalkHere(x, S),
+		myE = E < worldWidth && canWalkHere(E, y),
+		myW = W > -1 && canWalkHere(W, y),
+		result = [];
+		if(myN)
+		result.push({x:x, y:N});
+		if(myE)
+		result.push({x:E, y:y});
+		if(myS)
+		result.push({x:x, y:S});
+		if(myW)
+		result.push({x:W, y:y});
+		findNeighbours(myN, myS, myE, myW, N, S, E, W, result);
+		return result;
+	}
+		
+	function canWalkHere(x, y)
+	{
+		return map.getTile(x, y).walkable;		
+	};
+		
+		// Node function, returns a new object with Node properties
+	// Used in the calculatePath function to store route costs, etc.
+	function Node(Parent, Point)
+	{
+		var newNode = {
+			// pointer to another Node object
+			Parent:Parent,
+			// array index of this Node in the world linear array
+			value:Point.x + (Point.y * worldWidth),
+			// the location coordinates of this Node
+			x:Point.x,
+			y:Point.y,
+			// the heuristic estimated cost
+			// of an entire path using this node
+			f:0,
+			// the distanceFunction cost to get
+			// from the starting point to this node
+			g:0
+		};
+
+		return newNode;
+	}
 		
 	var calculatePath = function() {
 	
-		var mypathStart = Node(null, {x:pathStart[0], y:pathStart[1]});
+		// create Nodes from the Start and End x,y coordinates
+		var	mypathStart = Node(null, {x:pathStart[0], y:pathStart[1]});
 		var mypathEnd = Node(null, {x:pathEnd[0], y:pathEnd[1]});
 		
 		//could hold all of the tiles
@@ -92,9 +136,9 @@ findPath = function(pathStart, pathEnd) {
 			min = -1;
 			for(i = 0; i < length; i++)
 			{
-				if(Open[i].score < max)
+				if(Open[i].f < max)
 				{
-					max = Open[i].score;
+					max = Open[i].f;
 					min = i;
 				}
 			}
@@ -125,9 +169,9 @@ findPath = function(pathStart, pathEnd) {
 					if (!AStar[myPath.value])
 					{
 						// estimated cost of this particular route so far
-						myPath.g = myNode.g + distanceFunction(myNeighbours[i], myNode);
+						myPath.g = myNode.g + ManhattanDistance(myNeighbours[i], myNode);
 						// estimated cost of entire guessed route to the destination
-						myPath.f = myPath.g + distanceFunction(myNeighbours[i], mypathEnd);
+						myPath.f = myPath.g + ManhattanDistance(myNeighbours[i], mypathEnd);
 						// remember this new path for testing above
 						Open.push(myPath);
 						// mark this node in the world graph as visited

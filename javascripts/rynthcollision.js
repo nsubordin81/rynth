@@ -38,15 +38,57 @@ CollisionDetector = Class.extend({
 	}, 
 	performCollisions: function() {
 	
-		//loop through the unit array, check for monster hits and winning the game
-		for(var i = 0; i < unitManager.units.length; i++) {
-			if(unitManager.units[i].type == "runner" && this.collisionTest(map.getGoalTile(), unitManager.units[i])) {
-				gameEngine.winScreen();
-			}
-		
+		//check if we just won the game
+		if(unitManager.units[unitManager.selectedUnit].type == "runner" && this.collisionTest(unitManager.units[unitManager.selectedUnit], map.getGoalTile())) {
+			//console.log("setting " + gameEngine.win + " to true");
+			gameEngine.win = true;
 		}
 	
+		//loop through the unit array, check for monster hits
+		var updatedUnits = unitManager.units.slice(0);
+		for(var i = 0; i < unitManager.units.length; i++) {
+			for(var j = 0; j < unitManager.monsters.length; j++) {
+				if(this.collisionTest(unitManager.units[i], unitManager.monsters[j])) {
+					if(unitManager.units[i].type == "runner") {
+						updatedUnits.splice(i, 1);
+						//if selectedUnit was zero here we would be going negative, so clamp that
+						if(unitManager.selectedUnit != 0) {
+							unitManager.selectedUnit--;
+						}
+						unitManager.runnerCount--;
+					}
+					if(unitManager.units[i].type == "blocker") {
+						updatedUnits.splice(i, 1);
+						if(unitManager.selectedUnit != 0) { 
+							unitManager.selectedUnit--;
+						}
+						unitManager.blockerCount--;
+					}
+				}
+			}
+		}
+		//update array with missing elements
+		unitManager.units = updatedUnits;
+		if(unitManager.units.length > 0) {
+			unitManager.units[unitManager.selectedUnit].setSelectedColor();
+		}
+		//check if we just lost the game
+		if(unitManager.runnerCount == 0) {
+			gameEngine.lose = true;
+		}
 	
+	},
+	checkBounds: function(unit) {
+		if(unit.x > map.numColumns * map.tileDim - unit.width) {
+			unit.x = map.numColumns * map.tileDim - unit.width;
+		} else if(unit.x < 0) {
+			unit.x = 0;
+		}
+		if(unit.y > map.numRows * map.tileDim - unit.height) {
+			unit.y = map.numRows * map.tileDim - unit.height;
+		} else if(unit.y < 0) {
+			unit.y = 0;
+		}
 	}
 
 

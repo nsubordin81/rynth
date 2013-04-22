@@ -102,8 +102,8 @@
 			});
 			//frame based movement. . .  won't hold up in the big leagues.
 			Unit = BoundedObject.extend({
-				x: 385,
-				y: 570,
+				x: 400,
+				y: 560,
 				width: 30,
 				height: 30,
 				speed: 5,
@@ -155,7 +155,6 @@
 			});
 			
 			Runner = Unit.extend({
-				x: 395,
 				color: "#5073D4",
 				defaultColor: "#5073D4", 
 				width: 10,
@@ -166,27 +165,77 @@
 					canvas.fillRect(this.x, this.y, this.width, this.height);
 				}
 			});
-				
-			Lurker = Unit.extend({
-				type: "lurker",
-				color: "#F77906",
-				x: 382,
-				y: 0,
+			//the move function uses 40 as a constant for tile width. This will need to be fixed!!	
+			Monster = Unit.extend({
+				collided: false,
 				width: 35,
 				height: 35,
 				speed: 4,
-				collided: false
+				x: 400,
+				y: 0,
+				target: [10,14],
+				intervalId: 0,
+				path: [],
+				init: function() {
+					var self = this;
+					this.intervalId = setInterval(
+					function() {self.startChasing.call(self);}, 5000
+					);
+				},
+				searchForPrey: function(preyLocation) {
+					//put in the locations of the monster and the objective in world tile coordinates. Take off the first path because it is the current location.
+					this.path = findPath([Math.floor(this.x / map.tileDim),Math.floor(this.y / map.tileDim)], preyLocation);
+				},
+				move: function() {
+					var offset = this.speed / 2;
+					if(this.path.length > 0) {
+						var goal = this.path[0];
+						if(this.x > goal[0] * map.tileDim + offset) {
+							this._super("left");
+						} else if(this.x < goal[0] * map.tileDim - offset) {
+							this._super("right");
+						} else if(this.y > goal[1] * map.tileDim + offset) {
+							this._super("up");
+						} else if(this.y < goal[1] * map.tileDim - offset) {
+							this._super("down");
+						}
+						//make target a range and not a single pixel, to prevent endless headbanging
+						if(((this.x >= goal[0] * map.tileDim - offset && this.x <= goal[0] * map.tileDim + offset) && (this.y >= goal[1] * map.tileDim - offset && this.y <= goal[1] * map.tileDim + offset)) || this.collided)
+						{
+							//we arrived at goal, reset goal
+							this.path.shift();
+							//if we got here because we hit something reset colllided flag
+							this.collided = false;
+						}
+						
+					}else {
+						//pathfinder didn't find a result, push a random location on the map
+						var randomX = Math.floor((Math.random() * 20));
+						var randomY = Math.floor((Math.random() * 15));
+						this.path.push([randomX, randomY]);
+					}
+				},
+				fixPosition: function(dir, pos) {
+					this._super(dir, pos);
+					this.collided = true;
+				},
+				startChasing: function() {
+					this.searchForPrey(unitManager.closestRunnerToPos(this.target));
+				},
+				stopChasing: function() {
+					clearInterval(intervalId);
+				}
+			});
+				
+			Lurker = Monster.extend({
+				type: "lurker",
+				color: "#000000",
+				target: [10,0]
 			});
 			
-			Berserker = Unit.extend({
+			Berserker = Monster.extend({
 				type: "Berserker",
-				color: "#DE140A",
-				x: 382,
-				y: 0,
-				width: 35,
-				height: 35,
-				speed: 4,
-				collided: false
+				color: "#DE140A"
 			});
 			//holy cow this thing is a mess! Never will I ever try to have my tiles represented as actual entities again.
 			//and so much abuse of the global scope, it is like you can't look away.
@@ -349,7 +398,9 @@
 							this.tiles[x][y].unMakeWall();
 						}else{
 						for(var i = x - 1; i <= x + 1; i++){
-							this.tiles[i][y].makeWall();
+							if(i > 0 && i < map.numColumns && y > 0 && y < map.numRows) { 
+								this.tiles[i][y].makeWall();
+							}
 						}
 						}
 					}
@@ -359,7 +410,9 @@
 							this.tiles[x][y].unMakeWall();
 						}else{
 						for(var i = y - 1; i <= y + 1; i++) {
-							this.tiles[x][i].makeWall();
+							if(i > 0 && i < map.numColumns && y > 0 && y < map.numRows) { 
+								this.tiles[x][i].makeWall();
+							}
 						}
 						}
 					}
