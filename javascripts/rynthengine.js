@@ -72,7 +72,7 @@ GameEngine = Class.extend({
 				inputHandler.handleInput();
 				
 				this.monsterLoadTime += 1;
-				if(this.monsterLoadTime == 250 && unitManager.monsterCount < this.maxMonsters) {
+				if(this.monsterLoadTime == 400 && unitManager.monsterCount < this.maxMonsters) {
 					if(unitManager.monsterCount % 2 == 1) {
 						var lurker = new Lurker();
 						unitManager.monsters.push(lurker);

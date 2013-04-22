@@ -179,12 +179,14 @@
 				init: function() {
 					var self = this;
 					this.intervalId = setInterval(
-					function() {self.startChasing.call(self);}, 5000
+					function() {self.startChasing.call(self);}, 300
 					);
 				},
 				searchForPrey: function(preyLocation) {
 					//put in the locations of the monster and the objective in world tile coordinates. Take off the first path because it is the current location.
 					this.path = findPath([Math.floor(this.x / map.tileDim),Math.floor(this.y / map.tileDim)], preyLocation);
+					//remove first element because it makes the monsters jittery (they keep going back to the beginning of their path.)
+					this.path.splice(0,1);
 				},
 				move: function() {
 					var offset = this.speed / 2;
