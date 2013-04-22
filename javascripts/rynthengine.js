@@ -12,7 +12,7 @@ GameEngine = Class.extend({
 			inputHandler = new InputHandler();
 			map = new Map();
 			collisionDetector = new CollisionDetector();
-			unitManager = {units: [], monsters: [], selectedUnit: 0, buildTimes: [200, 500], buildIndex: 0, monsterCount: 0, runnerCount: 0, blockerCount: 0,
+			unitManager = {units: [], monsters: [], selectedUnit: 0, buildTimes: [150, 500], buildIndex: 0, monsterCount: 0, runnerCount: 0, blockerCount: 0,
 				buildingWhat: function() { 
 					switch(this.buildIndex){
 						case 0:
