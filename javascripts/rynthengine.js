@@ -94,7 +94,7 @@ GameEngine = Class.extend({
 						break;
 						case 1:
 							unitManager.units.push(new Runner());
-							unitManager.units.runnerCount++;
+							unitManager.runnerCount++;
 						break;
 						default:
 						break;
