@@ -12,7 +12,7 @@ GameEngine = Class.extend({
 			inputHandler = new InputHandler();
 			map = new Map();
 			collisionDetector = new CollisionDetector();
-			unitManager = {units: [], monsters: [], selectedUnit: 0, buildTimes: [200, 500], buildIndex: 0, monsterCount: 0, runnerCount: 0, blockerCount: 0,
+			unitManager = {units: [], monsters: [], selectedUnit: 0, buildTimes: [150, 500], buildIndex: 0, monsterCount: 0, runnerCount: 0, blockerCount: 0,
 				buildingWhat: function() { 
 					switch(this.buildIndex){
 						case 0:
@@ -72,7 +72,7 @@ GameEngine = Class.extend({
 				inputHandler.handleInput();
 				
 				this.monsterLoadTime += 1;
-				if(this.monsterLoadTime == 400 && unitManager.monsterCount < this.maxMonsters) {
+				if(this.monsterLoadTime == 200 && unitManager.monsterCount < this.maxMonsters) {
 					if(unitManager.monsterCount % 2 == 1) {
 						var lurker = new Lurker();
 						unitManager.monsters.push(lurker);
